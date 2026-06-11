@@ -64,7 +64,7 @@ export function GameScreen() {
         <BoardComponent
           board={board}
           onCellPress={handleCellPress}
-          onCellLongPress={handleCellLongPress}
+          onLongPress={handleCellLongPress}
         />
       </View>
     </View>
