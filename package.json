@@ -4,10 +4,16 @@
   "main": "index.ts",
   "dependencies": {
     "expo": "~56.0.11",
+    "expo-av": "^16.0.8",
+    "expo-haptics": "~56.0.3",
     "expo-status-bar": "~56.0.4",
+    "expo-system-ui": "~56.0.5",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-native": "0.85.3",
+    "react-native-appearance": "^0.3.4",
+    "react-native-gesture-handler": "~2.31.1",
+    "react-native-reanimated": "4.3.1",
     "react-native-web": "^0.21.2"
   },
   "devDependencies": {
@@ -16,8 +22,8 @@
   },
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web"
   },
   "private": true
