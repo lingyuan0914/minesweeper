@@ -1,6 +1,8 @@
 import React from 'react'
 import { View, Text, Pressable, StyleSheet } from 'react-native'
+import * as Haptics from 'expo-haptics'
 import { Difficulty } from '../src/types'
+import { useTheme } from './ThemeProvider'
 
 interface HeaderProps {
   minesRemaining: number
@@ -12,39 +14,72 @@ interface HeaderProps {
 const DIFFICULTY_LABELS: Record<Difficulty, string> = {
   beginner: '初级',
   intermediate: '中级',
-  expert: '高级'
+  expert: '高级',
 }
 
 export function Header({
   minesRemaining,
   currentDifficulty,
   onDifficultyChange,
-  onRestart
+  onRestart,
 }: HeaderProps) {
+  const { theme, isDark, toggleTheme } = useTheme()
+
+  const handleDifficultyPress = (difficulty: Difficulty) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+    onDifficultyChange(difficulty)
+  }
+
+  const handleRestartPress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+    onRestart()
+  }
+
+  const handleThemePress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+    toggleTheme()
+  }
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.mines}>💣 {minesRemaining}</Text>
-      
+    <View style={[styles.container, { backgroundColor: theme.surface, borderBottomColor: theme.surfaceBorder }]}>
+      <View style={styles.minesContainer}>
+        <Text style={[styles.minesIcon]}>💣</Text>
+        <Text style={[styles.mines, { color: theme.text }]}>{minesRemaining}</Text>
+      </View>
+
       <View style={styles.difficultyButtons}>
         {(Object.keys(DIFFICULTY_LABELS) as Difficulty[]).map((difficulty) => (
           <Pressable
             key={difficulty}
-            onPress={() => onDifficultyChange(difficulty)}
+            onPress={() => handleDifficultyPress(difficulty)}
             style={[
               styles.difficultyButton,
-              difficulty === currentDifficulty && styles.activeDifficulty
+              {
+                backgroundColor: difficulty === currentDifficulty ? theme.primary : theme.surface,
+                borderColor: difficulty === currentDifficulty ? theme.primary : theme.surfaceBorder,
+              },
             ]}
           >
-            <Text style={styles.difficultyText}>
+            <Text
+              style={[
+                styles.difficultyText,
+                { color: difficulty === currentDifficulty ? '#fff' : theme.text },
+              ]}
+            >
               {DIFFICULTY_LABELS[difficulty]}
             </Text>
           </Pressable>
         ))}
       </View>
 
-      <Pressable onPress={onRestart} style={styles.restartButton}>
-        <Text style={styles.restartText}>🔄</Text>
-      </Pressable>
+      <View style={styles.rightButtons}>
+        <Pressable onPress={handleThemePress} style={[styles.themeButton, { backgroundColor: theme.surface }]}>
+          <Text style={styles.themeIcon}>{isDark ? '☀️' : '🌙'}</Text>
+        </Pressable>
+        <Pressable onPress={handleRestartPress} style={[styles.restartButton, { backgroundColor: theme.danger }]}>
+          <Text style={styles.restartIcon}>🔄</Text>
+        </Pressable>
+      </View>
     </View>
   )
 }
@@ -56,37 +91,54 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#2c3e50'
+    borderBottomWidth: 1,
+  },
+  minesContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  minesIcon: {
+    fontSize: 20,
   },
   mines: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#ecf0f1'
   },
   difficultyButtons: {
     flexDirection: 'row',
-    gap: 8
+    gap: 8,
   },
   difficultyButton: {
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderRadius: 4,
-    backgroundColor: '#34495e'
-  },
-  activeDifficulty: {
-    backgroundColor: '#3498db'
+    borderRadius: 8,
+    borderWidth: 1,
   },
   difficultyText: {
-    color: '#fff',
-    fontSize: 14
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  rightButtons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  themeButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  themeIcon: {
+    fontSize: 16,
   },
   restartButton: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     paddingVertical: 8,
-    borderRadius: 4,
-    backgroundColor: '#e74c3c'
+    borderRadius: 8,
   },
-  restartText: {
-    fontSize: 18
-  }
+  restartIcon: {
+    fontSize: 16,
+  },
 })
